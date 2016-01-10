@@ -30,14 +30,14 @@ function checkExitStatus {
 LSOF=`$SUDO $LSOF | wc -l`
 
 if [ $LSOF -lt $WARNING ]; then
-    printf "OK $LSOF files open\n"
+    printf "OK $LSOF files open|files=$LSOF;$WARNING;$CRITICAL;0\n"
     ERROR_CODE=0
 else
     if [ $LSOF -ge $WARNING ] && [ $LSOF -le $CRITICAL ]; then
-        printf "WARN $LSOF files open\n"
+        printf "WARN $LSOF files open|files=$LSOF;$WARNING;$CRITICAL;0\n"
         ERROR_CODE=1
     elif [ $LSOF -ge $CRITICAL ]; then
-        printf "CRIT $LSOF files open\n"
+        printf "CRIT $LSOF files open|files=$LSOF;$WARNING;$CRITICAL;0\n"
         ERROR_CODE=2
   fi
 fi
