@@ -10,15 +10,14 @@
 # Bash strict mode, to make debugging easier see http://redsymbol.net/articles/unofficial-bash-strict-mode/
 set -euo pipefail
 IFS=$'\n\t'
-
 SUDO=$(which sudo)
 LSOF=$(which lsof)
 PGREP=$(which pgrep)
 WC=$(which wc)
 PROGRAM=""
-
 ERROR_CODE=-1
 set +u
+
 if [ -z "$1" ] || [ -z "$2" ] || [ "$2" -lt "$1" ] ; then
     echo "Usage: $0 warning critical program"
     echo "  warning: int"
@@ -30,9 +29,11 @@ else
     WARNING=$1
     CRITICAL=$2
 fi
+
 if [ ! -z "$3" ];then
     PROGRAM="$3"
 fi
+
 set -u
 
 function checkExitStatus {
@@ -41,6 +42,7 @@ function checkExitStatus {
         exit -1
     fi
 }
+
 if [ -z "$PROGRAM" ];then
     LSOF=$("$SUDO" "$LSOF" | "$WC" -l)
 else
