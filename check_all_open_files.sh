@@ -4,6 +4,12 @@
 #
 # Author: Gregor Binder
 # Mail: office@wefixit.at
+# https://github.com/wefixit-AT/nagios_check_all_open_files
+# Adapted for BGHW by Johannes Starosta <j.starosta@bghw.de>
+
+# Bash strict mode, to make debugging easier see http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
 
 SUDO=$(which sudo)
 LSOF=$(which lsof)
@@ -11,6 +17,7 @@ PGREP=$(which pgrep)
 WC=$(wc -l)
 
 ERROR_CODE=-1
+set +u
 if [ -z "$1" ] || [ -z "$2" ] || [ "$2" -lt "$1" ] ; then
     echo "Usage: $0 warning critical program"
     echo "  warning: int"
@@ -22,6 +29,7 @@ else
     WARNING=$1
     CRITICAL=$2
 fi
+set -u
 
 function checkExitStatus {
     if [ "$1" -ne 0 ]; then
