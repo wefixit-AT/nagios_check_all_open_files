@@ -13,7 +13,7 @@ IFS=$'\n\t'
 SUDO=$(command -v sudo)
 LSOF=$(command -v lsof)
 PGREP=$(command -v pgrep)
-WC=$(which wc)
+WC=$(command -v wc)
 PROGRAM=""
 ERROR_CODE=-1
 set +u
