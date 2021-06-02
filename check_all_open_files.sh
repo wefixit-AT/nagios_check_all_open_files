@@ -10,10 +10,10 @@
 # Bash strict mode, to make debugging easier see http://redsymbol.net/articles/unofficial-bash-strict-mode/
 set -euo pipefail
 IFS=$'\n\t'
-SUDO=$(which sudo)
-LSOF=$(which lsof)
-PGREP=$(which pgrep)
-WC=$(which wc)
+SUDO=$(command -v sudo)
+LSOF=$(command -v lsof)
+PGREP=$(command -v pgrep)
+WC=$(command -v wc)
 PROGRAM=""
 ERROR_CODE=-1
 set +u
@@ -30,7 +30,7 @@ else
     CRITICAL=$2
 fi
 
-if [ ! -z "$3" ];then
+if [ -n "$3" ];then
     PROGRAM="$3"
 fi
 
@@ -39,16 +39,16 @@ set -u
 function checkExitStatus {
     if [ "$1" -ne 0 ]; then
         echo "!!! command failure !!! $2"
-        exit -1
+        exit 1
     fi
 }
 
 if [ -z "$PROGRAM" ];then
     LSOF=$("$SUDO" "$LSOF" | "$WC" -l)
 else
-    PGREP=$("$PGREP" --full "$3")
+    list=$("$PGREP" --full "$3")
     summe=0
-    for i in $PGREP
+    for i in $list
     do
         tmp=$("$SUDO" "$LSOF" -p "$i" | "$WC" -l)
         summe=$((summe + tmp))
@@ -58,14 +58,12 @@ fi
 if [ "$LSOF" -lt "$WARNING" ]; then
     echo "OK $LSOF files open|files=$LSOF;$WARNING;$CRITICAL;0"
     ERROR_CODE=0
-else
-    if [ "$LSOF" -ge "$WARNING" ] && [ "$LSOF" -le "$CRITICAL" ]; then
-        echo "WARN $LSOF files open|files=$LSOF;$WARNING;$CRITICAL;0"
-        ERROR_CODE=1
-    elif [ "$LSOF" -ge "$CRITICAL" ]; then
-        echo "CRIT $LSOF files open|files=$LSOF;$WARNING;$CRITICAL;0"
-        ERROR_CODE=2
-  fi
+elif [ "$LSOF" -ge "$WARNING" ] && [ "$LSOF" -le "$CRITICAL" ]; then
+    echo "WARN $LSOF files open|files=$LSOF;$WARNING;$CRITICAL;0"
+    ERROR_CODE=1
+elif [ "$LSOF" -ge "$CRITICAL" ]; then
+    echo "CRIT $LSOF files open|files=$LSOF;$WARNING;$CRITICAL;0"
+    ERROR_CODE=2
 fi
 
 exit $ERROR_CODE
